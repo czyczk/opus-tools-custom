@@ -89,6 +89,16 @@
 #define IMIN(a,b) ((a) < (b) ? (a) : (b))   /**< Minimum int value.   */
 #define IMAX(a,b) ((a) > (b) ? (a) : (b))   /**< Maximum int value.   */
 
+/* SenaV build identity: the marker is bumped by hand per milestone; the
+   libopus (opus-custom) commit short hash is injected at build time via
+   -DSENAV_OPUS_COMMIT="..." (opus-custom tools/build_opusenc.py). */
+#define SENAV_MARKER "m3"
+#ifdef SENAV_OPUS_COMMIT
+# define SENAV_BUILD_ID " @" SENAV_OPUS_COMMIT
+#else
+# define SENAV_BUILD_ID ""
+#endif
+
 #if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3)
 # define FORMAT_PRINTF __attribute__((__format__(printf, 1, 2)))
 #else
@@ -108,7 +118,7 @@ static void fatal(const char *format, ...)
 
 static void opustoolsversion(const char *opusversion)
 {
-  printf("opusenc %s %s (Opus SenaV m2) (using %s)\n",PACKAGE_NAME,PACKAGE_VERSION,opusversion);
+  printf("opusenc %s %s (Opus SenaV " SENAV_MARKER SENAV_BUILD_ID ") (using %s)\n",PACKAGE_NAME,PACKAGE_VERSION,opusversion);
   printf("Copyright (C) 2008-2018 Xiph.Org Foundation\n");
 }
 
@@ -526,7 +536,7 @@ int main(int argc, char **argv)
   opus_version=opus_get_version_string();
   /*Vendor string should just be the encoder library,
     the ENCODER comment specifies the tool used.*/
-  snprintf(ENCODER_string, sizeof(ENCODER_string), "opusenc from %s %s (Opus SenaV m2)",PACKAGE_NAME,PACKAGE_VERSION);
+  snprintf(ENCODER_string, sizeof(ENCODER_string), "opusenc from %s %s (Opus SenaV " SENAV_MARKER SENAV_BUILD_ID ")",PACKAGE_NAME,PACKAGE_VERSION);
   ret = ope_comments_add(inopt.comments, "ENCODER", ENCODER_string);
   if (ret != OPE_OK) {
     fatal("Error: failed to add ENCODER comment: %s\n", ope_strerror(ret));
